@@ -29,19 +29,18 @@ Per release governance rules, every item below is categorized by its exact verif
   - 128-bit cryptographic caregiver invitation passcodes stored strictly as SHA-256 hashes (`tokenHash`) with atomic single-use DynamoDB conditional redemption and TTL expiration.
   - Both S3 buckets (`DoseGuardFrontendBucket` and `DoseGuardReportsBucket`) enforce `BlockPublicAccess.BLOCK_ALL`, `SSE-S3` encryption, `enforceSSL: true`, and origin-restricted CORS (`[frontendOrigin, 'http://localhost:5173']`).
   - Least-privilege per-Lambda IAM policies and scoped `iam:PassRole` (`iam:PassedToService = scheduler.amazonaws.com`).
-- **Local Git Commit (`feat: finalize DoseGuard AI serverless production release`)**: **COMPLETED** on branch `master` (commit `b796a64581119d2a9d7dc5f27b783066e5df56c2`, 68 tracked source files) with `.env`, credentials, `cdk.out/`, `dist/`, and `node_modules/` excluded via `.gitignore`.
+- **Local Git Commit & GitHub Remote Push (`feat: finalize DoseGuard AI serverless production release`)**: **COMPLETED AND INDEPENDENTLY VERIFIED** on `https://github.com/anujpote17808/doseguard-ai` (`origin/master`, commit `e70a2f1fbc54fd9460ad12c242986f66c4a53f80`, 68 tracked source files) with `.env`, credentials, `cdk.out/`, `dist/`, and `node_modules/` excluded via `.gitignore`.
 
-### B. Blocked by AWS CLI Session Expiration / Missing GitHub Remote URL
+### B. Blocked by AWS CLI Session Expiration & Dedicated IAM Identity Requirement
 - **Live AWS Deployment (`npx cdk diff`, `npx cdk bootstrap`, `npx cdk deploy --all`)**:
-  - **Exact Blocker**: `~/.aws/config` is configured with `login_session = arn:aws:iam::100939136329:root` (`region = us-east-1`), and running `aws sts get-caller-identity` currently returns:
+  - **Exact Blocker 1 (Expired Session)**: `~/.aws/config` is configured with `login_session = arn:aws:iam::100939136329:root` (`region = us-east-1`), and running `aws sts get-caller-identity` currently returns:
     ```text
     aws: [ERROR]: Your session has expired. Please reauthenticate using 'aws login'.
     ```
-  - **Public Frontend URL (`CloudFrontPublicUrl`)**: Pending `npx cdk deploy --all` after `aws login`.
-  - **API Gateway URL (`ApiGatewayUrl`)**: Pending `npx cdk deploy --all` after `aws login`.
+  - **Exact Blocker 2 (Root Identity Safeguard)**: `~/.aws/config` points to the AWS account **root** principal (`arn:aws:iam::100939136329:root`). Per security requirement #6 (*"Do not deploy with the AWS root identity. Check for a dedicated deployment IAM identity and its permissions. If unavailable, guide me through creating one"*), we must authenticate with a dedicated IAM user or role (e.g., `doseguard-deployer`) rather than `root`.
+  - **Public Frontend URL (`CloudFrontPublicUrl`)**: Pending `npx cdk deploy --all` after IAM authentication.
+  - **API Gateway URL (`ApiGatewayUrl`)**: Pending `npx cdk deploy --all` after IAM authentication.
   - **Live Endpoint E2E Verification**: Pending live stack deployment.
-- **GitHub Remote Push (`git push`)**:
-  - **Exact Blocker**: `git remote -v` is currently empty (no GitHub remote URL has been added to `doseguard-ai/.git` yet, and `gh` CLI is not installed).
 
 ### C. Completed but Not Independently Verified
 - None (all local code, builds, 22 automated tests, and 128-resource CloudFormation synthesis were independently executed and verified; live cloud deployment is explicitly held at the expired `aws login` gate).
