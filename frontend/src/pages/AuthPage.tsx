@@ -7,6 +7,7 @@ import {
   KeyRound,
   Lock,
   Mail,
+  Play,
   ServerCog,
   ShieldCheck,
   User,
@@ -29,8 +30,13 @@ export const AuthPage: React.FC = () => {
   const initialMode = (searchParams.get('mode') as AuthMode) || 'signin';
   const [mode, setMode] = useState<AuthMode>(initialMode);
 
-  const { signIn } = useAuth();
+  const { signIn, enterDemoMode } = useAuth();
   const navigate = useNavigate();
+
+  const handleLaunchDemoMode = async () => {
+    await enterDemoMode();
+    navigate('/dashboard');
+  };
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -128,6 +134,30 @@ export const AuthPage: React.FC = () => {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md space-y-4">
+        {/* Interactive Demo Mode Card */}
+        <div className="bg-gradient-to-r from-teal-950 via-navy-900 to-navy-900 border border-teal-500/40 rounded-2xl p-5 shadow-xl space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-400/20 border border-amber-400/40 px-2.5 py-0.5 text-[11px] font-bold text-amber-300">
+              Instant Public Walkthrough
+            </span>
+            <span className="text-[11px] text-teal-300 font-mono">Synthetic Sandbox</span>
+          </div>
+          <h2 className="text-sm font-bold text-white">
+            Explore DoseGuard AI in Interactive Demo Mode
+          </h2>
+          <p className="text-xs text-slate-300 leading-relaxed">
+            Test all 10 screens—medication scheduling, dose confirmation, Step Functions reminder simulation, SHA-256 caregiver passcodes, analytics charts, and CSV/JSON report downloads—using clearly labeled synthetic sample data.
+          </p>
+          <button
+            type="button"
+            onClick={handleLaunchDemoMode}
+            className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-navy-950 font-extrabold py-2.5 text-xs shadow transition-all"
+          >
+            <Play className="h-4 w-4" />
+            Enter Interactive Demo Mode (No Login Required)
+          </button>
+        </div>
+
         <div className="bg-navy-900/95 border border-slate-800 py-8 px-6 shadow-2xl rounded-2xl sm:px-8">
           {/* Mode Tabs */}
           <div className="grid grid-cols-2 gap-2 p-1 bg-navy-950 rounded-xl border border-slate-800 mb-6">

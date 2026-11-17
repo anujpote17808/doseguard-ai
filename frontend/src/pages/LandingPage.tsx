@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Activity,
@@ -11,6 +11,7 @@ import {
   FileSpreadsheet,
   HeartHandshake,
   Lock,
+  Play,
   ShieldCheck,
   Sparkles,
   Users,
@@ -19,7 +20,13 @@ import { WorkflowPipelineBanner } from '../components/WorkflowPipelineBanner';
 import { useAuth } from '../context/AuthContext';
 
 export const LandingPage: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, enterDemoMode } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLaunchDemo = async () => {
+    await enterDemoMode();
+    navigate('/dashboard');
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900">
@@ -66,18 +73,19 @@ export const LandingPage: React.FC = () => {
               </Link>
             ) : (
               <>
+                <button
+                  type="button"
+                  onClick={handleLaunchDemo}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-navy-950 font-bold px-4 py-2 text-xs sm:text-sm shadow transition-all"
+                >
+                  <Play className="h-3.5 w-3.5" />
+                  Try Interactive Demo
+                </button>
                 <Link
                   to="/auth"
                   className="text-sm font-semibold text-slate-200 hover:text-white px-3 py-2"
                 >
                   Sign In
-                </Link>
-                <Link
-                  to="/auth?mode=signup"
-                  className="inline-flex items-center gap-2 rounded-xl bg-teal-500 hover:bg-teal-400 text-navy-950 font-bold px-5 py-2.5 text-sm shadow-md transition-all"
-                >
-                  Get Started
-                  <ArrowRight className="h-4 w-4" />
                 </Link>
               </>
             )}
@@ -112,19 +120,21 @@ export const LandingPage: React.FC = () => {
               </p>
 
               <div className="flex flex-wrap items-center gap-4 pt-2">
-                <Link
-                  to={isAuthenticated ? '/dashboard' : '/auth?mode=signup'}
+                <button
+                  type="button"
+                  onClick={handleLaunchDemo}
                   className="inline-flex items-center gap-2.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-navy-950 font-bold px-7 py-4 text-base shadow-lg shadow-teal-500/20 transition-all"
                 >
-                  Launch Patient & Caregiver Portal
-                  <ArrowRight className="h-5 w-5" />
-                </Link>
-                <a
-                  href="#workflow"
+                  <Play className="h-5 w-5" />
+                  Launch Interactive Demo (Synthetic Sample Data)
+                </button>
+                <Link
+                  to={isAuthenticated ? '/dashboard' : '/auth'}
                   className="inline-flex items-center gap-2 rounded-xl bg-navy-800/90 hover:bg-navy-700 text-slate-200 border border-slate-700 font-semibold px-6 py-4 text-base transition-colors"
                 >
-                  Explore AWS Workflow
-                </a>
+                  Cognito Sign In / AWS Setup
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
 
               <div className="grid grid-cols-3 gap-4 pt-6 border-t border-slate-800/80 max-w-lg">

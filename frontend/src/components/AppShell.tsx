@@ -29,7 +29,7 @@ const NAV_ITEMS = [
 ];
 
 export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { profile, signOut } = useAuth();
+  const { profile, isDemoMode, resetDemoData, signOut } = useAuth();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -116,8 +116,16 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
             <div className="flex items-center gap-2 text-xs font-medium text-slate-600">
-              <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
-              <span>Cognito JWT Verified</span>
+              <span
+                className={`inline-flex h-2 w-2 rounded-full ${
+                  isDemoMode ? 'bg-amber-500' : 'bg-emerald-500'
+                }`}
+              ></span>
+              <span>
+                {isDemoMode
+                  ? 'INTERACTIVE DEMO MODE (Synthetic Data)'
+                  : 'Cognito JWT Verified'}
+              </span>
               <span className="hidden sm:inline text-slate-300">|</span>
               <span className="hidden sm:inline text-slate-500">
                 Organizational & Reminder Platform (Non-Diagnostic)
@@ -126,6 +134,18 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
           </div>
 
           <div className="flex items-center gap-3">
+            {isDemoMode && (
+              <button
+                type="button"
+                onClick={() => {
+                  resetDemoData();
+                  window.location.reload();
+                }}
+                className="hidden sm:inline-flex items-center gap-1 rounded-xl border border-amber-300 bg-amber-50 hover:bg-amber-100 px-3 py-1.5 text-xs font-semibold text-amber-900 transition-colors"
+              >
+                Reset Sample Data
+              </button>
+            )}
             <Link
               to="/doses"
               className="inline-flex items-center gap-1.5 rounded-xl bg-teal-600 hover:bg-teal-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition-colors"
@@ -135,6 +155,24 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
             </Link>
           </div>
         </header>
+
+        {isDemoMode && (
+          <div className="bg-amber-50 border-b border-amber-200 px-4 sm:px-8 py-2.5 text-xs text-amber-950 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <strong className="font-bold uppercase tracking-wider text-amber-900">
+                [Interactive Demo Sandbox]
+              </strong>{' '}
+              Exploring with synthetic patient & caregiver sample data stored locally in your browser while AWS account service subscription activation (`ap-south-1`) is pending. No real patient health data or external emails are transmitted.
+            </div>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="font-bold text-amber-900 underline hover:text-amber-700 shrink-0"
+            >
+              Exit Demo Mode
+            </button>
+          </div>
+        )}
 
         {/* Mobile Drawer */}
         {mobileMenuOpen && (

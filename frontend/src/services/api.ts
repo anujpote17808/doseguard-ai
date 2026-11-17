@@ -1,4 +1,5 @@
 import { cognitoGetCurrentSessionToken, getRuntimeConfig } from './cognitoAuth';
+import { demoApi, isInteractiveDemoMode } from './demoDataService';
 import {
   AdherenceReport,
   AnalyticsDetailResponse,
@@ -50,20 +51,29 @@ async function apiRequest<T>(path: string, options: RequestInit = {}): Promise<T
 
 export const api = {
   checkHealth: () =>
-    apiRequest<{ status: string; service: string; timestamp: string; region: string }>('/health'),
+    isInteractiveDemoMode()
+      ? demoApi.checkHealth()
+      : apiRequest<{ status: string; service: string; timestamp: string; region: string }>('/health'),
 
-  getProfile: () => apiRequest<{ profile: UserProfile }>('/api/v1/me'),
+  getProfile: () =>
+    isInteractiveDemoMode()
+      ? demoApi.getProfile()
+      : apiRequest<{ profile: UserProfile }>('/api/v1/me'),
 
   updateProfile: (payload: Partial<UserProfile>) =>
-    apiRequest<{ profile: UserProfile }>('/api/v1/me', {
-      method: 'PATCH',
-      body: JSON.stringify(payload),
-    }),
+    isInteractiveDemoMode()
+      ? demoApi.updateProfile(payload)
+      : apiRequest<{ profile: UserProfile }>('/api/v1/me', {
+          method: 'PATCH',
+          body: JSON.stringify(payload),
+        }),
 
   getMedications: (patientId?: string) =>
-    apiRequest<{ medications: Medication[]; patientId: string }>(
-      `/api/v1/medications${patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''}`
-    ),
+    isInteractiveDemoMode()
+      ? demoApi.getMedications()
+      : apiRequest<{ medications: Medication[]; patientId: string }>(
+          `/api/v1/medications${patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''}`
+        ),
 
   createMedication: (
     payload: {
@@ -80,162 +90,200 @@ export const api = {
     },
     patientId?: string
   ) =>
-    apiRequest<{ medication: Medication }>(
-      `/api/v1/medications${patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''}`,
-      {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      }
-    ),
+    isInteractiveDemoMode()
+      ? demoApi.createMedication(payload)
+      : apiRequest<{ medication: Medication }>(
+          `/api/v1/medications${patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''}`,
+          {
+            method: 'POST',
+            body: JSON.stringify(payload),
+          }
+        ),
 
   updateMedication: (
     id: string,
     payload: Partial<Medication>,
     patientId?: string
   ) =>
-    apiRequest<{ medication: Medication }>(
-      `/api/v1/medications/${encodeURIComponent(id)}${
-        patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''
-      }`,
-      {
-        method: 'PATCH',
-        body: JSON.stringify(payload),
-      }
-    ),
+    isInteractiveDemoMode()
+      ? demoApi.updateMedication(id, payload)
+      : apiRequest<{ medication: Medication }>(
+          `/api/v1/medications/${encodeURIComponent(id)}${
+            patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''
+          }`,
+          {
+            method: 'PATCH',
+            body: JSON.stringify(payload),
+          }
+        ),
 
   deleteMedication: (id: string, patientId?: string) =>
-    apiRequest<{ deleted: boolean; medicationId: string }>(
-      `/api/v1/medications/${encodeURIComponent(id)}${
-        patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''
-      }`,
-      {
-        method: 'DELETE',
-      }
-    ),
+    isInteractiveDemoMode()
+      ? demoApi.deleteMedication(id)
+      : apiRequest<{ deleted: boolean; medicationId: string }>(
+          `/api/v1/medications/${encodeURIComponent(id)}${
+            patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''
+          }`,
+          {
+            method: 'DELETE',
+          }
+        ),
 
   getTodayDoses: (patientId?: string) =>
-    apiRequest<{ doses: DoseRecord[]; patientId: string }>(
-      `/api/v1/doses/today${patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''}`
-    ),
+    isInteractiveDemoMode()
+      ? demoApi.getTodayDoses()
+      : apiRequest<{ doses: DoseRecord[]; patientId: string }>(
+          `/api/v1/doses/today${patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''}`
+        ),
 
   getDoseHistory: (patientId?: string) =>
-    apiRequest<{ doses: DoseRecord[]; patientId: string }>(
-      `/api/v1/doses/history${patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''}`
-    ),
+    isInteractiveDemoMode()
+      ? demoApi.getDoseHistory()
+      : apiRequest<{ doses: DoseRecord[]; patientId: string }>(
+          `/api/v1/doses/history${patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''}`
+        ),
 
   confirmDose: (doseId: string, patientId?: string) =>
-    apiRequest<{ dose: DoseRecord; idempotent: boolean }>(
-      `/api/v1/doses/${encodeURIComponent(doseId)}/confirm${
-        patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''
-      }`,
-      {
-        method: 'POST',
-        body: JSON.stringify({}),
-      }
-    ),
+    isInteractiveDemoMode()
+      ? demoApi.confirmDose(doseId)
+      : apiRequest<{ dose: DoseRecord; idempotent: boolean }>(
+          `/api/v1/doses/${encodeURIComponent(doseId)}/confirm${
+            patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''
+          }`,
+          {
+            method: 'POST',
+            body: JSON.stringify({}),
+          }
+        ),
 
   markDoseMissed: (doseId: string, patientId?: string) =>
-    apiRequest<{ dose: DoseRecord; caregiversNotified: number }>(
-      `/api/v1/doses/${encodeURIComponent(doseId)}/mark-missed${
-        patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''
-      }`,
-      {
-        method: 'POST',
-        body: JSON.stringify({}),
-      }
-    ),
+    isInteractiveDemoMode()
+      ? demoApi.markDoseMissed(doseId)
+      : apiRequest<{ dose: DoseRecord; caregiversNotified: number }>(
+          `/api/v1/doses/${encodeURIComponent(doseId)}/mark-missed${
+            patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''
+          }`,
+          {
+            method: 'POST',
+            body: JSON.stringify({}),
+          }
+        ),
 
   triggerReminderWorkflow: (medicationId: string, responseWindowSeconds = 60, patientId?: string) =>
-    apiRequest<{
-      started: boolean;
-      executionArn: string;
-      startDate: string;
-      responseWindowSeconds: number;
-    }>(
-      `/api/v1/doses/trigger-workflow${
-        patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''
-      }`,
-      {
-        method: 'POST',
-        body: JSON.stringify({ medicationId, responseWindowSeconds }),
-      }
-    ),
+    isInteractiveDemoMode()
+      ? demoApi.triggerReminderWorkflow(medicationId, responseWindowSeconds)
+      : apiRequest<{
+          started: boolean;
+          executionArn: string;
+          startDate: string;
+          responseWindowSeconds: number;
+        }>(
+          `/api/v1/doses/trigger-workflow${
+            patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''
+          }`,
+          {
+            method: 'POST',
+            body: JSON.stringify({ medicationId, responseWindowSeconds }),
+          }
+        ),
 
   getCaregivers: () =>
-    apiRequest<{
-      myCaregivers: CaregiverConnection[];
-      connectedPatients: CaregiverConnection[];
-      myInvitations: CaregiverInvitationSummary[];
-    }>('/api/v1/caregivers'),
+    isInteractiveDemoMode()
+      ? demoApi.getCaregivers()
+      : apiRequest<{
+          myCaregivers: CaregiverConnection[];
+          connectedPatients: CaregiverConnection[];
+          myInvitations: CaregiverInvitationSummary[];
+        }>('/api/v1/caregivers'),
 
   createCaregiverInvitation: (payload: {
     relationship: string;
     permissions: CaregiverPermission[];
     expiresInHours: number;
   }) =>
-    apiRequest<{
-      invitation: CaregiverInvitationSummary;
-      passcode: string;
-    }>('/api/v1/caregivers/invitations', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    }),
+    isInteractiveDemoMode()
+      ? demoApi.createCaregiverInvitation(payload)
+      : apiRequest<{
+          invitation: CaregiverInvitationSummary;
+          passcode: string;
+        }>('/api/v1/caregivers/invitations', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        }),
 
   redeemCaregiverInvitation: (payload: { passcode: string; caregiverName?: string }) =>
-    apiRequest<{ connection: CaregiverConnection }>('/api/v1/caregivers/invitations/redeem', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    }),
+    isInteractiveDemoMode()
+      ? demoApi.redeemCaregiverInvitation(payload)
+      : apiRequest<{ connection: CaregiverConnection }>('/api/v1/caregivers/invitations/redeem', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        }),
 
   revokeCaregiverOrInvitation: (id: string) =>
-    apiRequest<{ revoked: boolean }>(`/api/v1/caregivers/${encodeURIComponent(id)}`, {
-      method: 'DELETE',
-    }),
+    isInteractiveDemoMode()
+      ? demoApi.revokeCaregiverOrInvitation(id)
+      : apiRequest<{ revoked: boolean }>(`/api/v1/caregivers/${encodeURIComponent(id)}`, {
+          method: 'DELETE',
+        }),
 
   getAnalyticsSummary: (patientId?: string) =>
-    apiRequest<AnalyticsSummaryResponse>(
-      `/api/v1/analytics/summary${patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''}`
-    ),
+    isInteractiveDemoMode()
+      ? demoApi.getAnalyticsSummary()
+      : apiRequest<AnalyticsSummaryResponse>(
+          `/api/v1/analytics/summary${patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''}`
+        ),
 
   getAnalyticsAdherence: (patientId?: string) =>
-    apiRequest<AnalyticsDetailResponse>(
-      `/api/v1/analytics/adherence${patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''}`
-    ),
+    isInteractiveDemoMode()
+      ? demoApi.getAnalyticsAdherence()
+      : apiRequest<AnalyticsDetailResponse>(
+          `/api/v1/analytics/adherence${patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''}`
+        ),
 
   getNotifications: () =>
-    apiRequest<{ notifications: NotificationRecord[]; unreadCount: number }>(
-      '/api/v1/notifications'
-    ),
+    isInteractiveDemoMode()
+      ? demoApi.getNotifications()
+      : apiRequest<{ notifications: NotificationRecord[]; unreadCount: number }>(
+          '/api/v1/notifications'
+        ),
 
   markNotificationRead: (notificationId: string) =>
-    apiRequest<{ notification: NotificationRecord }>(
-      `/api/v1/notifications/${encodeURIComponent(notificationId)}/read`,
-      {
-        method: 'PATCH',
-      }
-    ),
+    isInteractiveDemoMode()
+      ? demoApi.markNotificationRead(notificationId)
+      : apiRequest<{ notification: NotificationRecord }>(
+          `/api/v1/notifications/${encodeURIComponent(notificationId)}/read`,
+          {
+            method: 'PATCH',
+          }
+        ),
 
   getReports: (patientId?: string) =>
-    apiRequest<{ reports: AdherenceReport[]; patientId: string }>(
-      `/api/v1/reports${patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''}`
-    ),
+    isInteractiveDemoMode()
+      ? demoApi.getReports()
+      : apiRequest<{ reports: AdherenceReport[]; patientId: string }>(
+          `/api/v1/reports${patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''}`
+        ),
 
   generateReport: (payload: { days: number; format: 'CSV' | 'JSON'; patientId?: string }) =>
-    apiRequest<{ report: AdherenceReport }>('/api/v1/reports', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    }),
+    isInteractiveDemoMode()
+      ? demoApi.generateReport(payload)
+      : apiRequest<{ report: AdherenceReport }>('/api/v1/reports', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        }),
 
   getReportDownloadUrl: (reportId: string, patientId?: string) =>
-    apiRequest<{
-      reportId: string;
-      downloadUrl: string;
-      expiresInSeconds: number;
-      format: 'CSV' | 'JSON';
-    }>(
-      `/api/v1/reports/${encodeURIComponent(reportId)}/download${
-        patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''
-      }`
-    ),
+    isInteractiveDemoMode()
+      ? demoApi.getReportDownloadUrl(reportId)
+      : apiRequest<{
+          reportId: string;
+          downloadUrl: string;
+          expiresInSeconds: number;
+          format: 'CSV' | 'JSON';
+        }>(
+          `/api/v1/reports/${encodeURIComponent(reportId)}/download${
+            patientId ? `?patientId=${encodeURIComponent(patientId)}` : ''
+          }`
+        ),
 };
 
