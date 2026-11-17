@@ -32,6 +32,10 @@ aws-exports.js
 coverage/
 **/coverage/
 
+# Vercel
+.vercel/
+**/.vercel/
+
 # OS & Editor
 .DS_Store
 .idea/

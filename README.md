@@ -7,6 +7,16 @@ DoseGuard AI is an end-to-end, production-grade AWS Serverless medication safety
 
 ---
 
+## Live Public Website (Vercel HTTPS + Interactive Demo Mode)
+
+- **Public Live Website URL**: **https://doseguard-ai.vercel.app**
+- **Secondary Vercel Alias**: https://frontend-nine-kappa-97.vercel.app
+- **GitHub Repository**: https://github.com/anujpote17808/doseguard-ai
+
+Visitors can click **"Try Interactive Demo"** / **"Launch Interactive Demo (Synthetic Sample Data)"** directly on the landing page or `/auth` screen to explore all 10 application screens in a clearly labeled **Interactive Demo Sandbox** without needing AWS Cognito credentials.
+
+---
+
 ## 1. The Problem & The Solution
 
 ### The Problem

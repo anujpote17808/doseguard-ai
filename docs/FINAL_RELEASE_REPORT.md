@@ -29,7 +29,12 @@ Per release governance rules, every item below is categorized by its exact verif
   - 128-bit cryptographic caregiver invitation passcodes stored strictly as SHA-256 hashes (`tokenHash`) with atomic single-use DynamoDB conditional redemption and TTL expiration.
   - Both S3 buckets (`DoseGuardFrontendBucket` and `DoseGuardReportsBucket`) enforce `BlockPublicAccess.BLOCK_ALL`, `SSE-S3` encryption, `enforceSSL: true`, and origin-restricted CORS (`[frontendOrigin, 'http://localhost:5173']`).
   - Least-privilege per-Lambda IAM policies and scoped `iam:PassRole` (`iam:PassedToService = scheduler.amazonaws.com`).
-- **Local Git Commit & GitHub Remote Push (`feat: finalize DoseGuard AI serverless production release`)**: **COMPLETED AND INDEPENDENTLY VERIFIED** on `https://github.com/anujpote17808/doseguard-ai` (`origin/master`, commit `e70a2f1fbc54fd9460ad12c242986f66c4a53f80`, 68 tracked source files) with `.env`, credentials, `cdk.out/`, `dist/`, and `node_modules/` excluded via `.gitignore`.
+- **Local Git Commit & GitHub Remote Push (`feat: finalize DoseGuard AI serverless production release`)**: **COMPLETED AND INDEPENDENTLY VERIFIED** on `https://github.com/anujpote17808/doseguard-ai` (`origin/master`) with `.env`, credentials, `cdk.out/`, `dist/`, `.vercel/`, and `node_modules/` excluded via `.gitignore`.
+- **Live Public Website Deployment (Vercel HTTPS + Interactive Demo Sandbox)**: **COMPLETED AND INDEPENDENTLY VERIFIED**:
+  - **Primary Public URL**: **https://doseguard-ai.vercel.app** (HTTP/2 `200 OK` verified across all 10 SPA routes: `/`, `/auth`, `/dashboard`, `/medications`, `/doses`, `/caregivers`, `/caregiver-portal`, `/analytics`, `/reports`, `/settings`).
+  - **Secondary Production Alias**: https://frontend-nine-kappa-97.vercel.app
+  - **Interactive Demo Sandbox**: Clearly labeled `[Interactive Demo Sandbox]` banner and synthetic sample data allowing any visitor to test medication CRUD, idempotent dose confirmation, simulated Step Functions workflow triggers, single-use caregiver passcode generation & redemption, Recharts adherence analytics, and CSV/JSON report downloads locally in their browser.
+  - **Production Bundle Security Scan**: Verified `CLEAN_ZERO_SECRETS` across `index-BQu36vT6.js` and `index-B2crFasB.css`.
 
 ### B. Blocked by AWS CLI Session Expiration & Dedicated IAM Identity Requirement
 - **Live AWS Deployment (`npx cdk diff`, `npx cdk bootstrap`, `npx cdk deploy --all`)**:
