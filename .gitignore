@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+dist/
+build/
+**/dist/
+**/build/
+cdk.out/
+**/cdk.out/
+*.tsbuildinfo
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+cdk-outputs.json
+**/cdk-outputs.json
+
+# AWS & Credentials
+.aws/
+*.pem
+*.key
+credentials
+aws-exports.js
+
+# Coverage & testing
+coverage/
+**/coverage/
+
+# OS & Editor
+.DS_Store
+.idea/
+.vscode/
+*.log
+npm-debug.log*
+
